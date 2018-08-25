@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -29,11 +30,25 @@ func GetPeopleEndPoint(w http.ResponseWriter, req *http.Request) {
 }
 
 func GetPersonEndPoint(w http.ResponseWriter, req *http.Request) {
+	params := mux.Vars(req)
 
+	for _, item := range people {
+		if item.ID == params["id"] {
+			json.NewEncoder(w).Encode(item)
+			return
+		}
+	}
+
+	json.NewEncoder(w).Encode(&Person{})
 }
 
 func CreatePersonEndPoint(w http.ResponseWriter, req *http.Request) {
-
+	params := mux.Vars(req)
+	var person Person
+	_ = json.NewDecoder(req.Body).Decode(&person)
+	person.ID = params["id"]
+	people = append(people, person)
+	json.NewEncoder(w).Encode(people)
 }
 
 func DeletePersonEndPoint(w http.ResponseWriter, req *http.Request) {
@@ -52,5 +67,8 @@ func main() {
 	router.HandleFunc("/people/{id}", CreatePersonEndPoint).Methods("POST")
 	router.HandleFunc("/people/{id}", GetPeopleEndPoint).Methods("DELETE")
 
+	fmt.Println("Application running on port 4200")
+
 	log.Fatal(http.ListenAndServe(":4200", router))
+
 }
