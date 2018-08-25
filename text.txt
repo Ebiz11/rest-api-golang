@@ -1,0 +1,2 @@
+jalankan untuk create exe -> go build namafile.go 
+jalankan untuk buka main.exe -> ./main
