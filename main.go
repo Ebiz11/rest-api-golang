@@ -52,7 +52,15 @@ func CreatePersonEndPoint(w http.ResponseWriter, req *http.Request) {
 }
 
 func DeletePersonEndPoint(w http.ResponseWriter, req *http.Request) {
+	params := mux.Vars(req)
+	for index, item := range people {
+		if item.ID == params["id"] {
+			people = append(people[:index], people[index+1:]...)
+			break
+		}
+	}
 
+	json.NewEncoder(w).Encode(people)
 }
 
 func main() {
@@ -65,7 +73,7 @@ func main() {
 	router.HandleFunc("/people", GetPeopleEndPoint).Methods("GET")
 	router.HandleFunc("/people/{id}", GetPersonEndPoint).Methods("GET")
 	router.HandleFunc("/people/{id}", CreatePersonEndPoint).Methods("POST")
-	router.HandleFunc("/people/{id}", GetPeopleEndPoint).Methods("DELETE")
+	router.HandleFunc("/people/{id}", DeletePersonEndPoint).Methods("DELETE")
 
 	fmt.Println("Application running on port 4200")
 
